@@ -1,4 +1,4 @@
-package com.epam.javacc.microservices.discovery;
+package com.epam.javacc.microservices.common;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
