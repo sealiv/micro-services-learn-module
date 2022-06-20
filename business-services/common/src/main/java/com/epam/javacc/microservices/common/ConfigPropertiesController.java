@@ -1,51 +1,49 @@
 package com.epam.javacc.microservices.common;
 
 import com.netflix.config.*;
-import com.netflix.config.sources.URLConfigurationSource;
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.URL;
-
-/**
- * Properties can read from config.properties, application.properties
- * and from any file which use in @Bean: public AbstractConfiguration addApplicationPropertiesSource() {...}
- */
 @RestController
 public class ConfigPropertiesController {
 
-    private DynamicStringProperty propertyFromAbstractConfigurationBean = DynamicPropertyFactory.getInstance()
-            .getStringProperty("baeldung.archaius.properties.one", "not found!");
-    private DynamicStringProperty propertyFromConfig_properties = DynamicPropertyFactory.getInstance()
-            .getStringProperty("a1", "not found!");
-    private DynamicStringProperty propertyFromApplication_properties = DynamicPropertyFactory.getInstance()
-            .getStringProperty("a2", "not found!");
+    private final DynamicStringProperty eurekaPort;
+    private final DynamicStringProperty onePort;
+    private final DynamicStringProperty twoPort;
+    private final DynamicStringProperty twoApiPort;
+    private final DynamicStringProperty eurekaDefaultZone;
 
-    @GetMapping("/property-from-dynamic-management")
-    public String getPropertyValue() {
-        return propertyFromAbstractConfigurationBean.getName() + ": " + propertyFromAbstractConfigurationBean.get();
+    public ConfigPropertiesController() {
+        eurekaPort = DynamicPropertyFactory.getInstance().getStringProperty("eureka.port", "8066");
+        onePort = DynamicPropertyFactory.getInstance().getStringProperty("one.port", "8001");
+        twoPort = DynamicPropertyFactory.getInstance().getStringProperty("two.port", "8002");
+        twoApiPort = DynamicPropertyFactory.getInstance().getStringProperty("two-api.port", "8003");
+        eurekaDefaultZone = DynamicPropertyFactory.getInstance()
+                .getStringProperty("eureka.client.service-url.defaultZone", "http://localhost:8066/eureka");
     }
 
-    @GetMapping("/a1")
-    public String getPropertyValueA1() {
-        DynamicStringProperty propertyFromConfig_properties = DynamicPropertyFactory.getInstance()
-                .getStringProperty("a1", "not found!");
-        return propertyFromConfig_properties.getName() + ": " + propertyFromConfig_properties.get();
+    @GetMapping("/eurekaPort")
+    public String getEurekaPortValue() {
+        return "Eureka port is: " + eurekaPort.getValue();
     }
 
-    @GetMapping("/a2")
-    public String getPropertyValueA2() {
-        return propertyFromApplication_properties.getName() + ": " + propertyFromApplication_properties.get();
+    @GetMapping("/onePort")
+    public String getOnePortValue() {
+        return "Port for module 'One' is: " + onePort.getValue();
     }
 
-    @Bean
-    public AbstractConfiguration addApplicationPropertiesSource() throws IOException {
-        URL configPropertyURL = (new ClassPathResource("other-config.properties")).getURL();
-        PolledConfigurationSource source = new URLConfigurationSource(configPropertyURL);
-        return new DynamicConfiguration(source, new FixedDelayPollingScheduler());
+    @GetMapping("/twoPort")
+    public String getTwoPortValue() {
+        return "Port for module 'Two' is: " + twoPort.getValue();
+    }
+
+    @GetMapping("/twoApiPort")
+    public String getTwoApiPortValue() {
+        return "Port for module 'Two-api' is: " + twoApiPort.getValue();
+    }
+
+    @GetMapping("/eurekaZone")
+    public String getEurekaDefaultZoneValue() {
+        return "Default zone for Eureka is: " + eurekaDefaultZone.getValue();
     }
 }
